@@ -3,15 +3,15 @@
 #include "bsp_usart.h"
 #include "system_f103.h"
 
-static uint8_t KeyPressFlag;
+static uint8_t KeyPressFlag;        //°´¼ü1¡¢2¡¢3°´ÏÂ±êÖ¾Î»
 
-const unsigned long DEBOUNCE_DELAY = 20; // Ïû¶¶Ê±¼ä£¨ºÁÃë£©
-const unsigned long LONG_PRESS_TIME = 1000; // ³¤°´Ê±¼äãÐÖµ
-const unsigned long DOUBLE_CLICK_INTERVAL = 200; // Ë«»÷¼ä¸ôãÐÖµ
-
-ButtonState currentState = IDLE;
-unsigned long pressStartTime = 0;
-unsigned long releaseStartTime = 0;
+static uint8_t buttonValue;                //°´¼üµçÆ½×´Ì¬
+static uint8_t keyPressStatus = RESET;     //°´¼ü°´ÏÂÊ±µÄµçÆ½×´Ì¬
+static uint8_t keyReleaseStatus = SET;     //°´¼üÊÍ·ÅÊ±µÄµçÆ½×´Ì¬
+static uint8_t pressTimes = 0;             //°´¼ü´ÎÊý
+static ButtonState currentState = IDLE;    //×´Ì¬»ú±äÁ¿
+static uint16_t pressStartTime = 0;        //°´¼ü°´ÏÂÊ±¿ÌÊ±¼ä
+static uint16_t releaseStartTime = 0;      //°´¼üÊÍ·ÅÊ±¿ÌÊ±¼ä
 
 void Key_Init(void)
 {
@@ -94,6 +94,7 @@ void Key_Init(void)
 uint8_t Key_GetNum(void)
 {
     uint8_t KeyNum;
+
     if(KeyPressFlag == KEY_1_PRESS)
     {
         KeyNum = KEY_1_NUM;
@@ -111,6 +112,7 @@ uint8_t Key_GetNum(void)
         KeyNum = KEY_3_NUM;
         KeyPressFlag = 0;
     }
+
     return KeyNum;			//·µ»Ø¼üÂëÖµ£¬Èç¹ûÃ»ÓÐ°´¼ü°´ÏÂ£¬ËùÓÐif¶¼²»³ÉÁ¢£¬Ôò¼üÂëÎªÄ¬ÈÏÖµ0
 }
 
@@ -150,96 +152,82 @@ void KEY_3_IRQHANDLER(void)                        		// ÌáÊ¾£ºÕâ¸öº¯ÊýÃû£¬ÊÇhÎÄ¼
 
 void CheckKeyEvent(KeyIndex key)
 {
-    uint8_t buttonValue;
-	if(key == KEY_1)
-		buttonValue = GPIO_ReadInputDataBit(KEY_1_GPIO, KEY_1_PIN); // ¶ÁÈ¡°´¼ü×´Ì¬£¨°´ÏÂÎªLOW£©
-	else if(key == KEY_2)
-		buttonValue = GPIO_ReadInputDataBit(KEY_2_GPIO, KEY_2_PIN); // ¶ÁÈ¡°´¼ü×´Ì¬£¨°´ÏÂÎªLOW£©
-	else if(key == KEY_3)
-		buttonValue = GPIO_ReadInputDataBit(KEY_3_GPIO, KEY_3_PIN); // ¶ÁÈ¡°´¼ü×´Ì¬£¨°´ÏÂÎªLOW£©
-	
+    if(key == KEY_1)
+    {
+        keyPressStatus = SET;
+        keyReleaseStatus = RESET;
+        buttonValue = GPIO_ReadInputDataBit(KEY_1_GPIO, KEY_1_PIN); // ¶ÁÈ¡°´¼ü×´Ì¬£¨°´ÏÂÎªRESET£©
+    }
+    else if(key == KEY_2)
+        buttonValue = GPIO_ReadInputDataBit(KEY_2_GPIO, KEY_2_PIN); // ¶ÁÈ¡°´¼ü×´Ì¬£¨°´ÏÂÎªRESET£©
+    else if(key == KEY_3)
+        buttonValue = GPIO_ReadInputDataBit(KEY_3_GPIO, KEY_3_PIN); // ¶ÁÈ¡°´¼ü×´Ì¬£¨°´ÏÂÎªRESET£©
+
     uint16_t currentTime = System_GetTimeMs();
 
-    switch (currentState)
-    {
-    case IDLE:
-        if (buttonValue == RESET)   // ¼ì²âµ½°´ÏÂ
-        {
-            currentState = DEBOUNCE_PRESS;
-            pressStartTime = currentTime;
-        }
-        break;
-
-    case DEBOUNCE_PRESS:
-        if (currentTime - pressStartTime >= DEBOUNCE_DELAY)
-        {
-            if (buttonValue == RESET)   // È·ÈÏ°´ÏÂ£¬½øÈëPRESSED×´Ì¬
-            {
+    switch (currentState) {
+        // ¿ÕÏÐ×´Ì¬£ºµÈ´ý°´ÏÂ
+        case IDLE:
+            if (buttonValue == keyPressStatus) {
                 currentState = PRESSED;
-                pressStartTime = currentTime; // ¼ÇÂ¼³¤°´¿ªÊ¼Ê±¼ä
+                pressStartTime = currentTime;
             }
-            else     // ¶¶¶¯£¬·µ»ØIDLE
-            {
-                currentState = IDLE;
-            }
-        }
-        break;
 
-    case PRESSED:
-        if (buttonValue == SET)   // °´¼üÊÍ·Å
-        {
-            currentState = DEBOUNCE_RELEASE;
-            releaseStartTime = currentTime;
-        }
-        else
-        {
-            // ¼ì²â³¤°´
-            if (currentTime - pressStartTime >= LONG_PRESS_TIME)
-            {
-                handleLongPress();
-                currentState = IDLE;
-            }
-        }
-        break;
+            break;
 
-    case DEBOUNCE_RELEASE:
-        if (currentTime - releaseStartTime >= DEBOUNCE_DELAY)
-        {
-            if (buttonValue == SET)   // È·ÈÏÊÍ·Å£¬µÈ´ýË«»÷
-            {
-                currentState = WAIT_DOUBLE;
-                releaseStartTime = currentTime;
+        // °´ÏÂ×´Ì¬£ºµÈ´ýÊÍ·Å
+        case PRESSED:
+            if (buttonValue == keyReleaseStatus) {        // °´¼üÊÍ·Å
+                pressTimes++;
+                if(pressTimes == 2)     currentState = RELEASED;        //ÒÑ¾­°´ÁËÁ½´Î°´¼ü£¬Ö±½Ó½øÈëRELEASED×´Ì¬´¦ÀíÊÂ¼þ
+                else                    currentState = WAIT_DOUBLE;     //°´ÁËÒ»´Î°´¼ü£¬½øÈëµÈ´ýµÚ¶þ´Î°´¼ü°´ÏÂ×´Ì¬
+                releaseStartTime = currentTime;                         //¼ÇÂ¼°´¼üÊÍ·ÅÊ±¼ä
             }
-            else     // ÈÔ´¦ÓÚ°´ÏÂ×´Ì¬£¬·µ»ØPRESSED
-            {
-                currentState = PRESSED;
-            }
-        }
-        break;
 
-    case WAIT_DOUBLE:
-        if (buttonValue == RESET)   // ÔÙ´Î°´ÏÂ
-        {
-            currentState = DEBOUNCE_PRESS;
-            unsigned long waitTime = currentTime - releaseStartTime;
-            if (waitTime <= DOUBLE_CLICK_INTERVAL)
+            break;
+
+        case RELEASED:
+            if(pressTimes == 2 && releaseStartTime - pressStartTime < LONG_PRESS_TIME)
             {
                 handleDoubleClick();
-                currentState = IDLE; // ´¥·¢Ë«»÷ºóÖ±½Ó»Øµ½IDLE
             }
-            else
+            if(pressTimes == 1)
             {
-                handleClick(); // ³¬Ê±ºó´¥·¢µ¥»÷
-                pressStartTime = currentTime; // ¿ªÊ¼ÐÂµÄ°´ÏÂ´¦Àí
-                currentState = DEBOUNCE_PRESS;
+                if(currentTime - pressStartTime > LONG_PRESS_TIME)
+                {
+                    handleLongPress();
+                }
+                else
+                {
+                    handleClick();
+                }
             }
-        }
-        else if (currentTime - releaseStartTime >= DOUBLE_CLICK_INTERVAL)
-        {
-            handleClick(); // ³¬Ê±£¬´¥·¢µ¥»÷
+            pressTimes = 0;
             currentState = IDLE;
-        }
-        break;
+            break;
+        // µÈ´ýË«»÷×´Ì¬£º¼ì²â¶þ´Î°´ÏÂ»ò³¬Ê±
+        case WAIT_DOUBLE:
+            if(buttonValue == keyPressStatus)
+            {
+                pressStartTime = currentTime;
+                //ÔÚË«»÷¼ä¸ôÄÚ°´ÏÂ
+                if(currentTime - releaseStartTime <= DOUBLE_CLICK_INTERVAL)
+                {
+                    currentState = PRESSED;
+                }
+                //ÔÚË«»÷¼ä¸ôÍâ°´ÏÂ£¬ÊÓÎªÐÂµÄÒ»´Î°´¼üÊÂ¼þ£¬°´¼ü´ÎÊýÇåÁã
+                else if(currentTime - releaseStartTime > DOUBLE_CLICK_INTERVAL)
+                {
+                    currentState = PRESSED;
+                    pressTimes = 0;
+                }
+            }
+            else if(currentTime - releaseStartTime > DOUBLE_CLICK_INTERVAL)     //ÔÚË«»÷¼ä¸ôÍâ²»°´ÏÂ
+            {
+                currentState = RELEASED;
+            }
+
+            break;
     }
 }
 

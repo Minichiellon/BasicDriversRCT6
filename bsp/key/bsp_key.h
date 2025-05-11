@@ -2,20 +2,22 @@
 #define _BSP_KEY_H
 #include <stm32f10x.h>  
 
+#define LONG_PRESS_TIME         1000 // 长按时间阈值
+#define DOUBLE_CLICK_INTERVAL   200 // 双击间隔阈值
+
 typedef enum
 {
-    IDLE,
-    DEBOUNCE_PRESS,
-    PRESSED,
-    DEBOUNCE_RELEASE,
-    WAIT_DOUBLE
+    IDLE,           //空闲状态
+    PRESSED,        //按下状态
+    RELEASED,       //释放状态
+    WAIT_DOUBLE     //等待第二次按下状态
 } ButtonState;
 
 typedef enum
 {
-	KEY_1,
-	KEY_2,
-	KEY_3
+	KEY_1,          //按键1
+	KEY_2,          //按键2
+	KEY_3           //按键3
 }KeyIndex;
 
 /*****************************************************************************
