@@ -23,10 +23,7 @@
 #include "stm32f10x_conf.h"                          // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用) 
 #include "system_f103.h"
 #include "test.h"
-#include "bsp_led.h"                                 // LED代码文件
-#include "bsp_key.h"                                 // KEY代码文件
-#include "bsp_usart.h"
-#include "bsp_can.h"
+#include "bspInc_conf.h"
 #include "UsartCtlCan.h"
 // 延时函数
 void delay_ms(uint32_t ms)                    // 简单的毫秒延时函数
@@ -45,6 +42,7 @@ int main(void)                                       // 主函数, 整个工程的用户代
     System_SysTickInit();
     Led_Init();                                      // LED初始化
     Key_Init();                                      // KEY初始化
+    Timer_Init();
 	delay_ms(200);
 	//串口配置波特率方法：上位机一直发送ascii编码的数字，如：125、250等，然后按复位
 	//如果不使用串口配置波特率的话，直接修改上面的变量
@@ -61,9 +59,9 @@ int main(void)                                       // 主函数, 整个工程的用户代
 //        Key_Led_test();
 //        Usart_test();
 //        Can_test();
-        UsartCtlCan();
+//        UsartCtlCan();
 //        CheckKeyEvent(KEY_2);
-    }
+    } 
 }
 
 

@@ -24,7 +24,6 @@
 #include "stdio.h"
 
 
-
 #define CAN1_TX_GPIO   GPIOA
 #define CAN1_TX_PIN    GPIO_Pin_12
 
@@ -32,8 +31,6 @@
 #define CAN1_RX_PIN    GPIO_Pin_11
 
 #define RECIVE_ID       ((uint32_t)0x1234)     // 决定接收哪些ID发来的报文 
-
-
 
 
 /*****************************************************************************
@@ -49,29 +46,12 @@ typedef struct
 extern xCAN_InfoDef  xCAN;         // 声明为全局变量,方便记录信息、状态
 
 
-
-
-
-
-
-
 /*****************************************************************************
  ** 声明全局函数
 ****************************************************************************/
-void CAN1_Config(uint16_t baudrate);
-uint8_t CAN1_SendData(uint32_t targetID, uint8_t* data);    // 发送数据; data:数据缓存，targetID:ID号，　返回：发送所用的邮箱号
-void    CAN1_ReceiveData(uint8_t* data);                    // 接收数据
-
-
-
-
-
-
-
-
-
-
-
+extern void CAN1_Config(uint16_t baudrate);
+extern uint8_t CAN1_SendData(uint32_t targetID, uint8_t* data);    // 发送数据; data:数据缓存，targetID:ID号，　返回：发送所用的邮箱号
+extern void    CAN1_ReceiveData(uint8_t* data);                    // 接收数据
 
 
 #endif
