@@ -46,9 +46,11 @@ int main(void)                                       // 主函数, 整个工程的用户代
     Led_Init();                                      // LED初始化
     Key_Init();                                      // KEY初始化
 	delay_ms(200);
+	//串口配置波特率方法：上位机一直发送ascii编码的数字，如：125、250等，然后按复位
+	//如果不使用串口配置波特率的话，直接修改上面的变量
 	if(xUSART.USART1ReceivedNum > 0)
 	{
-		CAN1_baudrate = xUSART.USART1ReceivedData[0]*100 + xUSART.USART1ReceivedData[1]*10 + xUSART.USART1ReceivedData[2];
+		CAN1_baudrate = (xUSART.USART1ReceivedData[0]-'0')*100 + (xUSART.USART1ReceivedData[1]-'0')*10 + xUSART.USART1ReceivedData[2]-'0';
 		xUSART.USART1ReceivedNum = 0;
 	}
     CAN1_Config(CAN1_baudrate);                                   // CAN1初始化
