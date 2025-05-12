@@ -6,7 +6,7 @@ xCAN_InfoDef  xCAN;         // 声明为全局变量,方便记录信息、状态
 
 
 
-void CAN1_Config(void)
+void CAN1_Config(uint16_t baudrate)
 {
     GPIO_InitTypeDef GPIO_InitStructure; 
     CAN_InitTypeDef  CAN_InitStructure;                  
@@ -36,7 +36,7 @@ void CAN1_Config(void)
     CAN_InitStructure.CAN_TTCM = DISABLE;              // 时间触发
     CAN_InitStructure.CAN_TXFP = DISABLE;              // 按报文存入邮箱的先后顺序发送，否则按默认ID优先级发送
     // CAN波特率=1Mbps=1tq*(1+BS1+BS2)=(BRR*Tpclk)*(1+BS1+BS2)
-    CAN_InitStructure.CAN_Prescaler = 48;               // 分频系数
+    CAN_InitStructure.CAN_Prescaler = 48 / (baudrate / 125);   // 分频系数
     CAN_InitStructure.CAN_SJW = CAN_SJW_2tq;           // 不影响位时序，影响同步效率
     CAN_InitStructure.CAN_BS1 = CAN_BS1_2tq;
     CAN_InitStructure.CAN_BS2 = CAN_BS2_3tq;    

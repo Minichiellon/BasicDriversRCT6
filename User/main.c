@@ -39,21 +39,28 @@ void delay_ms(uint32_t ms)                    // 简单的毫秒延时函数
 
 int main(void)                                       // 主函数, 整个工程的用户代码起始点
 {
+	uint16_t CAN1_baudrate = 125;
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  // 中断分组，组2:抢占级0~3,子优先级0~3 ; 全局只设置一次，尽量放在显眼的地方
     USART1_Init(115200);
     System_SysTickInit();
     Led_Init();                                      // LED初始化
     Key_Init();                                      // KEY初始化
-    CAN1_Config();                                   // CAN1初始化
-    delay_ms(200);
+	delay_ms(200);
+	if(xUSART.USART1ReceivedNum > 0)
+	{
+		CAN1_baudrate = xUSART.USART1ReceivedData[0]*100 + xUSART.USART1ReceivedData[1]*10 + xUSART.USART1ReceivedData[2];
+		xUSART.USART1ReceivedNum = 0;
+	}
+    CAN1_Config(CAN1_baudrate);                                   // CAN1初始化
+    
     
     while (1)                                        // while函数死循环，不能让main函数运行结束，否则会产生硬件错误
     {
 //        Key_Led_test();
 //        Usart_test();
 //        Can_test();
-//        UsartCtlCan();
-        CheckKeyEvent(KEY_2);
+        UsartCtlCan();
+//        CheckKeyEvent(KEY_2);
     }
 }
 
