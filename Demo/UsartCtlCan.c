@@ -38,7 +38,7 @@ void ProcessSingleLine(char *line) {
 	
 	if(command == 1) {
         CAN1_SendData(can_id, can_data); // 假设CAN发送函数已实现
-		delay_ms(1);
+		System_DelayMS(1);
     }
 }
 

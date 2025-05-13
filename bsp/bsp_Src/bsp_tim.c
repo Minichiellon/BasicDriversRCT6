@@ -1,6 +1,7 @@
 #include "bsp_tim.h"
 
-uint16_t Num;
+uint16_t TIM2_Num;
+uint8_t TIM2_IrqFlag;
 /**
   * 函    数：定时中断初始化
   * 参    数：无
@@ -55,8 +56,8 @@ void TIM2_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
 	{
-		Num++;
-        printf("%d", Num);
+		TIM2_Num++;
+		TIM2_IrqFlag = 1;
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 	}
 }

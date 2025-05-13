@@ -25,13 +25,6 @@
 #include "test.h"
 #include "bspInc_conf.h"
 #include "UsartCtlCan.h"
-// 延时函数
-void delay_ms(uint32_t ms)                    // 简单的毫秒延时函数
-{
-    ms = ms * 6500;                                  // 72MHz系统时钟下，多少个空循环约耗时1ms
-    for (uint32_t i = 0; i < ms; i++);               
-}
-
 
 
 int main(void)                                       // 主函数, 整个工程的用户代码起始点
@@ -43,7 +36,7 @@ int main(void)                                       // 主函数, 整个工程的用户代
     Led_Init();                                      // LED初始化
     Key_Init();                                      // KEY初始化
     Timer_Init();
-	delay_ms(200);
+	System_DelayMS(200);
 	//串口配置波特率方法：上位机一直发送ascii编码的数字，如：125、250等，然后按复位
 	//如果不使用串口配置波特率的话，直接修改上面的变量
 	if(xUSART.USART1ReceivedNum > 0)
@@ -57,10 +50,12 @@ int main(void)                                       // 主函数, 整个工程的用户代
     while (1)                                        // while函数死循环，不能让main函数运行结束，否则会产生硬件错误
     {
 //        Key_Led_test();
+//        CheckKeyEvent(KEY_2);
 //        Usart_test();
 //        Can_test();
-//        UsartCtlCan();
-//        CheckKeyEvent(KEY_2);
+//        Timer_test();
+        
+        UsartCtlCan();
     } 
 }
 

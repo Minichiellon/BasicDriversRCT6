@@ -10,13 +10,13 @@
       <TargetName>STM32F103</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060750::V5.06 update 6 (build 750)::.\ARMCC</pCCUsed>
+      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F103RC</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F1xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F1xx_DFP.2.3.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0xC000) IROM(0x08000000,0x40000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -530,11 +530,6 @@
           <GroupName>bsp_Inc</GroupName>
           <Files>
             <File>
-              <FileName>bmp.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\bsp\bsp_Inc\bmp.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_24Cxx.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\bsp\bsp_Inc\bsp_24Cxx.h</FilePath>
@@ -593,16 +588,6 @@
               <FileName>bsp_led.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\bsp\bsp_Inc\bsp_led.h</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_oled.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\bsp\bsp_Inc\bsp_oled.h</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_OLED_7Pin.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\bsp\bsp_Inc\bsp_OLED_7Pin.h</FilePath>
             </File>
             <File>
               <FileName>bsp_pwm.h</FileName>
@@ -705,11 +690,6 @@
               <FilePath>..\bsp\bsp_Inc\mallco.h</FilePath>
             </File>
             <File>
-              <FileName>oledfont.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\bsp\bsp_Inc\oledfont.h</FilePath>
-            </File>
-            <File>
               <FileName>servo.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\bsp\bsp_Inc\servo.h</FilePath>
@@ -773,6 +753,16 @@
               <FileName>bsp_IC.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\bsp\bsp_Src\bsp_IC.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_OLED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\bsp_OLED.c</FilePath>
+            </File>
+            <File>
+              <FileName>OLED_Data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\OLED_Data.c</FilePath>
             </File>
           </Files>
         </Group>
