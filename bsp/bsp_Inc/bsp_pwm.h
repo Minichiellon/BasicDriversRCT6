@@ -7,6 +7,6 @@
 
 extern void PWM_Init(void);
 extern void PWM_SetCompare1(uint16_t Compare);
-
+extern void PWM_SetPrescaler(uint16_t Prescaler);
 #endif
 

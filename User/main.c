@@ -19,12 +19,12 @@
  **【备注说明】  版权归魔女科技所有，请勿商用，谢谢！
  **              https://demoboard.taobao.com
 ====================================================================================================================*/
-#include <stm32f10x.h>                               // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用)     
-#include "stm32f10x_conf.h"                          // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用) 
-#include "system_f103.h"
-#include "test.h"
-#include "bspInc_conf.h"
-#include "UsartCtlCan.h"
+#include <stm32f10x.h>              // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用)     
+#include "stm32f10x_conf.h"         // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用) 
+#include "system_f103.h"            // 常用的系统函数、初始化函数
+#include "test.h"                   // 测试函数
+#include "bspInc_conf.h"            // bsp各模块头文件统一管理
+#include "UsartCtlCan.h"            // demo中的头文件
 
 
 int main(void)                                       // 主函数, 整个工程的用户代码起始点
@@ -35,7 +35,10 @@ int main(void)                                       // 主函数, 整个工程的用户代
     System_SysTickInit();
     Led_Init();                                      // LED初始化
     Key_Init();                                      // KEY初始化
-    Timer_Init();
+    Timer_Init();                                    // 定时器初始化
+    OLED_Init();                                     // OLED初始化
+    PWM_Init();
+    IC_Init();
 	System_DelayMS(200);
 	//串口配置波特率方法：上位机一直发送ascii编码的数字，如：125、250等，然后按复位
 	//如果不使用串口配置波特率的话，直接修改上面的变量
@@ -54,8 +57,9 @@ int main(void)                                       // 主函数, 整个工程的用户代
 //        Usart_test();
 //        Can_test();
 //        Timer_test();
-        
-        UsartCtlCan();
+//        OLED_test();
+        IC_test();
+//        UsartCtlCan();
     } 
 }
 

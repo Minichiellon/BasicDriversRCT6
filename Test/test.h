@@ -8,5 +8,6 @@ extern void Key_Led_test(void);
 extern void Usart_test(void);
 extern void Can_test(void);
 extern void Timer_test(void);
-extern void OLED_test(uint8_t TESTx);
+extern void OLED_test(void);
+extern void IC_test(void);
 #endif

@@ -12,14 +12,14 @@ void PWM_Init(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);			//开启GPIOA的时钟
 	
 	/*GPIO重映射*/
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);			//开启AFIO的时钟，重映射必须先开启AFIO的时钟
-//	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);			//将TIM2的引脚部分重映射，具体的映射方案需查看参考手册
-//	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);		//将JTAG引脚失能，作为普通GPIO引脚使用
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);			//开启AFIO的时钟，重映射必须先开启AFIO的时钟
+	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);			//将TIM2的引脚部分重映射，具体的映射方案需查看参考手册
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);		//将JTAG引脚失能，作为普通GPIO引脚使用
 	
 	/*GPIO初始化*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;		//GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);							//将PA0引脚初始化为复用推挽输出	
 																	//受外设控制的引脚，均需要配置为复用模式		
@@ -63,4 +63,14 @@ void PWM_SetCompare1(uint16_t Compare)
 	TIM_SetCompare1(TIM2, Compare);		//设置CCR1的值
 }
 
-
+/**
+  * 函    数：PWM设置PSC
+  * 参    数：Prescaler 要写入的PSC的值，范围：0~65535
+  * 返 回 值：无
+  * 注意事项：PSC和ARR共同决定频率，此函数仅设置PSC的值，并不直接是频率
+  *           频率Freq = CK_PSC / (PSC + 1) / (ARR + 1)
+  */
+void PWM_SetPrescaler(uint16_t Prescaler)
+{
+    TIM_PrescalerConfig(TIM2, Prescaler, TIM_PSCReloadMode_Immediate);        //设置PSC的值
+}

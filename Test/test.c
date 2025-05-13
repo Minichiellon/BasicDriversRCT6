@@ -84,10 +84,8 @@ void Timer_test(void)
     }
 }
 
-void OLED_test(uint8_t TESTx)
+void OLED_test(void)
 {
-    if(TESTx == 1)
-    {
         /*在(0, 0)位置显示字符'A'，字体大小为8*16点阵*/
         OLED_ShowChar(0, 0, 'A', OLED_8X16);
         
@@ -189,9 +187,8 @@ void OLED_test(uint8_t TESTx)
         
         /*延时3000ms，观察现象*/
         System_DelayMS(3000);
-    }
-    if(TESTx == 2)
-    {
+        
+        
         for (uint8_t i = 0; i < 4; i ++)
 		{
 			/*将OLED显存数组部分数据取反，从(0, i * 16)位置开始，宽128像素，高16像素*/
@@ -201,7 +198,7 @@ void OLED_test(uint8_t TESTx)
 			OLED_Update();
 			
 			/*延时1000ms，观察现象*/
-			System_DelayMS(1000);
+			System_DelayMS(3000);
 			
 			/*把取反的内容翻转回来*/
 			OLED_ReverseArea(0, i * 16, 128, 16);
@@ -214,6 +211,43 @@ void OLED_test(uint8_t TESTx)
 		OLED_Update();
 		
 		/*延时1000ms，观察现象*/
-		System_DelayMS(1000);
+		System_DelayMS(3000);
+        
+        /*清空OLED显存数组*/
+        OLED_Clear();
+}
+
+void IC_test(void)
+{
+    static uint16_t delay = 0;
+    static uint8_t duty = 50;
+    static uint16_t prescaler = 720;
+    static uint8_t flash_flag = 0;
+    if(flash_flag == 0)
+    {
+        flash_flag = 1;
+        /*显示静态字符串*/
+        OLED_ShowString(0, 0, "Freq:00000Hz", OLED_8X16);      //1行1列显示字符串Freq:00000Hz
+        OLED_ShowString(0, 17, "Duty:00%", OLED_8X16);          //2行1列显示字符串Duty:00%
+        OLED_Update();
     }
+    if(TIM2_IrqFlag)
+    {
+        delay++;
+        if(delay > 3000)    //3s
+        {
+            /*使用PWM模块提供输入捕获的测试信号，每3秒改变一次*/
+            PWM_SetPrescaler(prescaler - 1);                  //PWM频率Freq = 72M / (PSC + 1) / 100
+            prescaler /= 2;
+            if(prescaler < 45) prescaler = 720;
+            
+            PWM_SetCompare1(duty);                        //PWM占空比Duty = CCR / 100
+            duty += 10;
+            if(duty > 100)  duty = 0;
+        }
+        TIM2_IrqFlag = 0;
+    }
+    OLED_ShowNum(40, 0, IC_GetFreq(), 5, OLED_8X16);    //不断刷新显示输入捕获测得的频率
+    OLED_ShowNum(40, 17, IC_GetDuty(), 2, OLED_8X16);    //不断刷新显示输入捕获测得的占空比
+    OLED_Update();
 }
