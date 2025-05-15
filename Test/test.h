@@ -10,4 +10,5 @@ extern void Can_test(void);
 extern void Timer_test(void);
 extern void OLED_test(void);
 extern void IC_test(void);
+extern void ADC_test(void);
 #endif

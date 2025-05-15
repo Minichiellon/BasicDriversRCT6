@@ -251,3 +251,25 @@ void IC_test(void)
     OLED_ShowNum(40, 17, IC_GetDuty(), 2, OLED_8X16);    //不断刷新显示输入捕获测得的占空比
     OLED_Update();
 }
+
+void ADC_test(void)
+{
+    static uint8_t flash_flag = 0;
+    if(flash_flag == 0)
+    {
+        flash_flag = 1;
+        /*显示静态字符串*/
+        OLED_ShowString(0, 0, "AD0:", OLED_8X16);
+        OLED_ShowString(0, 17, "AD1:", OLED_8X16);
+        OLED_ShowString(0, 33, "AD2:", OLED_8X16);
+        OLED_ShowString(0, 49, "AD3:", OLED_8X16);
+    }
+    
+    OLED_ShowNum(33, 0, AD_Value[0], 4, OLED_8X16);		//显示转换结果第0个数据
+    OLED_ShowNum(33, 17, AD_Value[1], 4, OLED_8X16);		//显示转换结果第1个数据
+    OLED_ShowNum(33, 33, AD_Value[2], 4, OLED_8X16);		//显示转换结果第2个数据
+    OLED_ShowNum(33, 49, AD_Value[3], 4, OLED_8X16);		//显示转换结果第3个数据
+    
+    System_DelayMS(100);							//延时100ms，手动增加一些转换的间隔时间
+}
+

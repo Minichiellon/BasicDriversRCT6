@@ -39,6 +39,7 @@ int main(void)                                       // 主函数, 整个工程的用户代
     OLED_Init();                                     // OLED初始化
     PWM_Init();
     IC_Init();
+    AD_Init();
 	System_DelayMS(200);
 	//串口配置波特率方法：上位机一直发送ascii编码的数字，如：125、250等，然后按复位
 	//如果不使用串口配置波特率的话，直接修改上面的变量
@@ -58,7 +59,8 @@ int main(void)                                       // 主函数, 整个工程的用户代
 //        Can_test();
 //        Timer_test();
 //        OLED_test();
-        IC_test();
+//        IC_test();
+        ADC_test();
 //        UsartCtlCan();
     } 
 }

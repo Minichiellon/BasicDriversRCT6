@@ -9,4 +9,6 @@
 #include "bsp_OLED.h"           // OLED代码文件
 #include "bsp_IC.h"             // 输入捕获代码文件
 #include "bsp_pwm.h"            // pwm代码文件
+#include "bsp_ADC.h"            // ADC代码文件
+
 #endif
