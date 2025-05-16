@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/bsp/bsp_Inc",
+                "${workspaceFolder}/Demo",
+                "${workspaceFolder}/Libraries/CMSIS",
+                "${workspaceFolder}/Libraries/FWlib/inc",
+                "${workspaceFolder}/System",
+                "${workspaceFolder}/Test",
+                "${workspaceFolder}/User"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:\\msys64\\ucrt64\\bin\\gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    "version": 4
+}
