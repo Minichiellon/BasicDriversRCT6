@@ -263,13 +263,82 @@ void ADC_test(void)
         OLED_ShowString(0, 17, "AD1:", OLED_8X16);
         OLED_ShowString(0, 33, "AD2:", OLED_8X16);
         OLED_ShowString(0, 49, "AD3:", OLED_8X16);
+        OLED_Update();
     }
     
     OLED_ShowNum(33, 0, AD_Value[0], 4, OLED_8X16);		//显示转换结果第0个数据
     OLED_ShowNum(33, 17, AD_Value[1], 4, OLED_8X16);		//显示转换结果第1个数据
     OLED_ShowNum(33, 33, AD_Value[2], 4, OLED_8X16);		//显示转换结果第2个数据
     OLED_ShowNum(33, 49, AD_Value[3], 4, OLED_8X16);		//显示转换结果第3个数据
+    OLED_Update();
     
     System_DelayMS(100);							//延时100ms，手动增加一些转换的间隔时间
+}
+
+void MPU6050_test(void)
+{
+    uint8_t ID;                             //定义用于存放ID号的变量
+    int16_t AX, AY, AZ, GX, GY, GZ;			//定义用于存放各个数据的变量
+    static uint8_t flash_flag = 0;
+    
+    if(flash_flag == 0)
+    {
+        flash_flag = 1;
+        /*显示静态字符串*/
+        OLED_ShowString(0, 0, "ID:", OLED_8X16);		//显示静态字符串
+        ID = MPU6050_GetID();				            //获取MPU6050的ID号
+        OLED_ShowHexNum(24, 0, ID, 2, OLED_8X16);		//OLED显示ID号
+        OLED_Update();
+    }
+    MPU6050_GetData(&AX, &AY, &AZ, &GX, &GY, &GZ);		//获取MPU6050的数据
+    OLED_ShowSignedNum(0, 16, AX, 5, OLED_8X16);			//OLED显示数据
+    OLED_ShowSignedNum(0, 32, AY, 5, OLED_8X16);
+    OLED_ShowSignedNum(0, 48, AZ, 5, OLED_8X16);
+    OLED_ShowSignedNum(56, 16, GX, 5, OLED_8X16);
+    OLED_ShowSignedNum(56, 32, GY, 5, OLED_8X16);
+    OLED_ShowSignedNum(56, 48, GZ, 5, OLED_8X16);
+    OLED_Update();
+}
+
+void W25Q64_test(void)
+{
+    uint8_t MID;                            //定义用于存放MID号的变量
+    uint16_t DID;                            //定义用于存放DID号的变量
+
+    uint8_t ArrayWrite[] = {0x01, 0x02, 0x03, 0x04};    //定义要写入数据的测试数组
+    uint8_t ArrayRead[4];                                //定义要读取数据的测试数组
+    static uint8_t flash_flag = 0;
+    
+    if(flash_flag == 0)
+    {
+        flash_flag = 1;
+        /*显示静态字符串*/
+        OLED_ShowString(0, 0, "MID:   DID:", OLED_8X16);
+        OLED_ShowString(0, 16, "W:", OLED_8X16);
+        OLED_ShowString(0, 32, "R:", OLED_8X16);
+        
+        /*显示ID号*/
+        W25Q64_ReadID(&MID, &DID);            //获取W25Q64的ID号
+        OLED_ShowHexNum(32, 0, MID, 2, OLED_8X16);        //显示MID
+        OLED_ShowHexNum(88, 0, DID, 4, OLED_8X16);        //显示DID
+        
+        /*W25Q64功能函数测试*/
+        W25Q64_SectorErase(0x000000);                    //扇区擦除
+        W25Q64_PageProgram(0x000000, ArrayWrite, 4);    //将写入数据的测试数组写入到W25Q64中
+        
+        W25Q64_ReadData(0x000000, ArrayRead, 4);        //读取刚写入的测试数据到读取数据的测试数组中
+        
+        /*显示数据*/
+        OLED_ShowHexNum(16, 16, ArrayWrite[0], 2, OLED_8X16);        //显示写入数据的测试数组
+        OLED_ShowHexNum(40, 16, ArrayWrite[1], 2, OLED_8X16);
+        OLED_ShowHexNum(64, 16, ArrayWrite[2], 2, OLED_8X16);
+        OLED_ShowHexNum(88, 16, ArrayWrite[3], 2, OLED_8X16);
+        
+        OLED_ShowHexNum(16, 32, ArrayRead[0], 2, OLED_8X16);            //显示读取数据的测试数组
+        OLED_ShowHexNum(40, 32, ArrayRead[1], 2, OLED_8X16);
+        OLED_ShowHexNum(64, 32, ArrayRead[2], 2, OLED_8X16);
+        OLED_ShowHexNum(88, 32, ArrayRead[3], 2, OLED_8X16);
+        OLED_Update();
+    }
 }
 

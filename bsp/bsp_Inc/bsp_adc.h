@@ -2,7 +2,6 @@
 #define __AD_H
 
 #include "stm32f10x.h"                  // Device header
-#include "stm32f10x_conf.h"
 
 extern uint16_t AD_Value[4];
 

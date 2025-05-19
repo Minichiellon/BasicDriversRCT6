@@ -705,14 +705,34 @@
               <FilePath>..\bsp\bsp_Inc\bsp_IC.h</FilePath>
             </File>
             <File>
-              <FileName>bspInc_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\bsp\bsp_Inc\bspInc_conf.h</FilePath>
-            </File>
-            <File>
               <FileName>bsp_ADC.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\bsp\bsp_Inc\bsp_ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_MPU6050.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bsp\bsp_Inc\bsp_MPU6050.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_MPU6050_Reg.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bsp\bsp_Inc\bsp_MPU6050_Reg.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_W25Q64.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bsp\bsp_Inc\bsp_W25Q64.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_W25Q64_Ins.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bsp\bsp_Inc\bsp_W25Q64_Ins.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_SPI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\bsp\bsp_Inc\bsp_SPI.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -769,6 +789,21 @@
               <FileType>1</FileType>
               <FilePath>..\bsp\bsp_Src\bsp_ADC.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_MPU6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\bsp_MPU6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_W25Q64.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\bsp_W25Q64.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_SPI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\bsp_SPI.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -818,6 +853,16 @@
               <FileName>stm32f10x_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\User\stm32f10x_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>bspInc_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\User\bspInc_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_InitTest_conf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\bsp_InitTest_conf.c</FilePath>
             </File>
           </Files>
         </Group>

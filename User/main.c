@@ -20,47 +20,22 @@
  **              https://demoboard.taobao.com
 ====================================================================================================================*/
 #include <stm32f10x.h>              // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用)     
-#include "stm32f10x_conf.h"         // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用) 
+//#include "stm32f10x_conf.h"         // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用) 
 #include "system_f103.h"            // 常用的系统函数、初始化函数
-#include "test.h"                   // 测试函数
 #include "bspInc_conf.h"            // bsp各模块头文件统一管理
 #include "UsartCtlCan.h"            // demo中的头文件
 
 
 int main(void)                                       // 主函数, 整个工程的用户代码起始点
 {
-	uint16_t CAN1_baudrate = 125;
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  // 中断分组，组2:抢占级0~3,子优先级0~3 ; 全局只设置一次，尽量放在显眼的地方
-    USART1_Init(115200);
+    bsp_init();
     System_SysTickInit();
-    Led_Init();                                      // LED初始化
-    Key_Init();                                      // KEY初始化
-    Timer_Init();                                    // 定时器初始化
-    OLED_Init();                                     // OLED初始化
-    PWM_Init();
-    IC_Init();
-    AD_Init();
 	System_DelayMS(200);
-	//串口配置波特率方法：上位机一直发送ascii编码的数字，如：125、250等，然后按复位
-	//如果不使用串口配置波特率的话，直接修改上面的变量
-	if(xUSART.USART1ReceivedNum > 0)
-	{
-		CAN1_baudrate = (xUSART.USART1ReceivedData[0]-'0')*100 + (xUSART.USART1ReceivedData[1]-'0')*10 + xUSART.USART1ReceivedData[2]-'0';
-		xUSART.USART1ReceivedNum = 0;
-	}
-    CAN1_Config(CAN1_baudrate);                                   // CAN1初始化
-    
     
     while (1)                                        // while函数死循环，不能让main函数运行结束，否则会产生硬件错误
     {
-//        Key_Led_test();
-//        CheckKeyEvent(KEY_2);
-//        Usart_test();
-//        Can_test();
-//        Timer_test();
-//        OLED_test();
-//        IC_test();
-        ADC_test();
+        bsp_test();
 //        UsartCtlCan();
     } 
 }
