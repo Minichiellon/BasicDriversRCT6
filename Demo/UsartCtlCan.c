@@ -8,27 +8,27 @@
 extern void delay_ms(uint32_t ms);
 
 void ProcessSingleLine(char *line) {
-    // Ìø¹ıĞĞÊ×¿Õ°××Ö·û
+    // è·³è¿‡è¡Œé¦–ç©ºç™½å­—ç¬¦
     while(*line == ' ' || *line == '\r') line++;
     
     char *ptr = strtok(line, " ");
     if(!ptr) return;
 
-    // ½âÎöÃüÁîÎ»
+    // è§£æå‘½ä»¤ä½
     uint8_t command = atoi(ptr);
     if(command != 0 && command != 1) return;
 
-    // ½âÎöCAN ID£¨¹Ø¼üĞŞ¸Ä£©
+    // è§£æCAN IDï¼ˆå…³é”®ä¿®æ”¹ï¼‰
     ptr = strtok(NULL, " ");
     if(!ptr) return;
     
-    // Ê¹ÓÃstrtoulÖ±½Ó×ª»»ÍêÕûÊ®Áù½øÖÆ×Ö·û´®
+    // ä½¿ç”¨strtoulç›´æ¥è½¬æ¢å®Œæ•´åå…­è¿›åˆ¶å­—ç¬¦ä¸²
     uint32_t can_id = strtoul(ptr, NULL, 16);
     
-    // ÑéÖ¤ID·¶Î§£¨±ê×¼Ö¡ID·¶Î§0x000-0x7FF£©
+    // éªŒè¯IDèŒƒå›´ï¼ˆæ ‡å‡†å¸§IDèŒƒå›´0x000-0x7FFï¼‰
     if(can_id > 0x7FF) return;
 
-    // ½âÎöÊı¾İ¶Î£¨±£³ÖÔ­Âß¼­£©
+    // è§£ææ•°æ®æ®µï¼ˆä¿æŒåŸé€»è¾‘ï¼‰
     uint8_t can_data[8];
     for(int i = 0; i < 8; i++) {
         ptr = strtok(NULL, " ");
@@ -37,18 +37,18 @@ void ProcessSingleLine(char *line) {
     }
 	
 	if(command == 1) {
-        CAN1_SendData(can_id, can_data); // ¼ÙÉèCAN·¢ËÍº¯ÊıÒÑÊµÏÖ
+        CAN1_SendData(can_id, can_data); // å‡è®¾CANå‘é€å‡½æ•°å·²å®ç°
 		System_DelayMS(1);
     }
 }
 
 void ProcessUartData(uint8_t *data, uint16_t len) {
-    char *saveptr; // ÓÃÓÚstrtok_rµÄÉÏÏÂÎÄÖ¸Õë
+    char *saveptr; // ç”¨äºstrtok_rçš„ä¸Šä¸‹æ–‡æŒ‡é’ˆ
     char *line = strtok_r((char *)data, "\r\n", &saveptr);
     
     while(line != NULL) {
-        // Ìø¹ı¿ÕĞĞ
-        if(strlen(line) < 20) { // ×îĞ¡ÓĞĞ§ĞĞ³¤¶È¼ì²é
+        // è·³è¿‡ç©ºè¡Œ
+        if(strlen(line) < 20) { // æœ€å°æœ‰æ•ˆè¡Œé•¿åº¦æ£€æŸ¥
             line = strtok_r(NULL, "\r\n", &saveptr);
             continue;
         }
@@ -66,3 +66,4 @@ void UsartCtlCan(void)
         xUSART.USART1ReceivedNum = 0;
     }
 }
+
