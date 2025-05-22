@@ -13,5 +13,5 @@ extern void IC_test(void);
 extern void ADC_test(void);
 extern void MPU6050_test(void);     //ok
 extern void W25Q64_test(void);      //ok
-
+extern void Flash_test(void);       //ok
 #endif

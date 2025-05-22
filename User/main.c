@@ -19,8 +19,7 @@
  **【备注说明】  版权归魔女科技所有，请勿商用，谢谢！
  **              https://demoboard.taobao.com
 ====================================================================================================================*/
-#include <stm32f10x.h>              // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用)     
-//#include "stm32f10x_conf.h"         // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用) 
+#include <stm32f10x.h>              // 头文件引用(标准库); 内核、芯片外设....;(stm32f10x.conf.h, 对标准库头文件进行调用)
 #include "system_f103.h"            // 常用的系统函数、初始化函数
 #include "bspInc_conf.h"            // bsp各模块头文件统一管理
 #include "UsartCtlCan.h"            // demo中的头文件
@@ -37,7 +36,7 @@ int main(void)                                       // 主函数, 整个工程的用户代
     {
         bsp_test();
 //        UsartCtlCan();
-    } 
+    }
 }
 
 

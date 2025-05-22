@@ -186,6 +186,7 @@ void CheckKeyEvent(KeyIndex key)
 
             break;
 
+        //释放状态：处理事件
         case RELEASED:
             if(pressTimes == 2 && releaseStartTime - pressStartTime < LONG_PRESS_TIME)
             {
@@ -205,6 +206,7 @@ void CheckKeyEvent(KeyIndex key)
             pressTimes = 0;
             currentState = IDLE;
             break;
+
         // 等待双击状态：检测二次按下或超时
         case WAIT_DOUBLE:
             if(buttonValue == keyPressStatus)

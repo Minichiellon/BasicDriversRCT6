@@ -34,5 +34,6 @@ void bsp_test(void)
 //    IC_test();
 //    ADC_test();
 //    MPU6050_test();
-    W25Q64_test(); 
+//    W25Q64_test(); 
+    Flash_test();
 }

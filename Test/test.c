@@ -342,3 +342,73 @@ void W25Q64_test(void)
     }
 }
 
+void Flash_test(void)
+{
+    static uint32_t STORE_START_ADDRESS = 0x0800FC00;		//存储的起始地址
+    static uint16_t STORE_COUNT = 512;				//存储数据的个数
+    static uint16_t Store_Data[512];				//定义SRAM数组
+    
+    static uint8_t flash_flag = 0;
+    uint8_t KeyNum = Key_GetNum();
+    
+    if(flash_flag == 0)
+    {
+        flash_flag = 1;
+        /*显示静态字符串*/
+        OLED_ShowString(0, 0, "Flag:", OLED_8X16);
+        OLED_ShowString(0, 16, "Data:", OLED_8X16);
+        OLED_Update();
+        
+        /*判断是不是第一次使用*/
+        if (Flash_ReadHalfWord(STORE_START_ADDRESS) != 0xA5A5)	//读取第一个半字的标志位，if成立，则执行第一次使用的初始化
+        {
+            Flash_ErasePage(STORE_START_ADDRESS);					//擦除指定页
+            Flash_ProgramHalfWord(STORE_START_ADDRESS, 0xA5A5);	//在第一个半字写入自己规定的标志位，用于判断是不是第一次使用
+            for (uint16_t i = 1; i < STORE_COUNT; i ++)				//循环STORE_COUNT次，除了第一个标志位
+            {
+                Flash_ProgramHalfWord(STORE_START_ADDRESS + i * 2, 0x0000);		//除了标志位的有效数据全部清0
+            }
+        }
+        
+        /*上电时，将闪存数据加载回SRAM数组，实现SRAM数组的掉电不丢失*/
+        for (uint16_t i = 0; i < STORE_COUNT; i ++)					//循环STORE_COUNT次，包括第一个标志位
+        {
+            Store_Data[i] = Flash_ReadHalfWord(STORE_START_ADDRESS + i * 2);		//将闪存的数据加载回SRAM数组
+        }
+    }
+    
+    if(KeyNum == KEY_1_NUM)
+    {
+        Store_Data[1] ++;		//变换测试数据
+        Store_Data[2] += 2;
+        Store_Data[3] += 3;
+        Store_Data[4] += 4;
+        
+        Flash_ErasePage(STORE_START_ADDRESS);				//擦除指定页
+        for (uint16_t i = 0; i < STORE_COUNT; i ++)			//循环STORE_COUNT次，包括第一个标志位
+        {
+            Flash_ProgramHalfWord(STORE_START_ADDRESS + i * 2, Store_Data[i]);	//将SRAM数组的数据备份保存到闪存
+        }
+    }
+    
+    if(Key_GetNum() == KEY_2_NUM)
+    {
+        for (uint16_t i = 1; i < STORE_COUNT; i ++)			//循环STORE_COUNT次，除了第一个标志位
+        {
+            Store_Data[i] = 0x0000;							//SRAM数组有效数据清0
+        }
+        
+    	Flash_ErasePage(STORE_START_ADDRESS);				//擦除指定页
+        for (uint16_t i = 0; i < STORE_COUNT; i ++)			//循环STORE_COUNT次，包括第一个标志位
+        {
+            Flash_ProgramHalfWord(STORE_START_ADDRESS + i * 2, Store_Data[i]);	//将SRAM数组的数据备份保存到闪存
+        }
+    }
+    
+    OLED_ShowHexNum(40, 0, Store_Data[0], 4, OLED_8X16);	//显示Store_Data的第一位标志位
+    OLED_ShowHexNum(0, 32, Store_Data[1], 4, OLED_8X16);	//显示Store_Data的有效存储数据
+    OLED_ShowHexNum(40, 32, Store_Data[2], 4, OLED_8X16);
+    OLED_ShowHexNum(0, 48, Store_Data[3], 4, OLED_8X16);
+    OLED_ShowHexNum(40, 48, Store_Data[4], 4, OLED_8X16);
+    OLED_Update();
+}
