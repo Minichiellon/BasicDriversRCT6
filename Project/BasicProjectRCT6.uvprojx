@@ -804,6 +804,21 @@
               <FileType>1</FileType>
               <FilePath>..\bsp\bsp_Src\bsp_SPI.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_w25qxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\bsp_w25qxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_lcd_ili9341.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\bsp_lcd_ili9341.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_Flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bsp\bsp_Src\bsp_Flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

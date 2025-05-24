@@ -34,8 +34,8 @@ int main(void)                                       // 主函数, 整个工程的用户代
     
     while (1)                                        // while函数死循环，不能让main函数运行结束，否则会产生硬件错误
     {
-        bsp_test();
-//        UsartCtlCan();
+//        bsp_test();
+        UsartCtlCan();
     }
 }
 

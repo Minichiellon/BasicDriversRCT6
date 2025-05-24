@@ -13,6 +13,8 @@
 #include "bsp_MPU6050.h"        // MPU6050代码文件
 #include "bsp_W25Q64.h"         // W25Q64代码文件
 #include "bsp_Flash.h"          // Flash代码文件
+#include "bsp_w25qxx.h"         // w25qxx代码文件
+#include "bsp_lcd_ili9341.h"    // Lcd代码文件
 
 extern void bsp_init(void);
 extern void bsp_test(void);
