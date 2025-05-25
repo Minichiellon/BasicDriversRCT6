@@ -85,13 +85,13 @@ static int8_t CheckIsInCanList(uint8_t CanListType, uint32_t CanId)
 }
 
 /**
-  * 函    数：将报文插入报文列表
+  * 函    数：更新报文列表
   * 参    数：CanListType：报文列表类型，0-发送列表，1 -接收列表
               Pos：插入位置
               CanInfo：要插入的报文
   * 返 回 值：无
   */
-static void InsertCanList(uint8_t CanListType, uint8_t Pos, CAN_INFO CanInfo)
+static void UpdateCanList(uint8_t CanListType, uint8_t Pos, CAN_INFO CanInfo)
 {
     if(CanListType == CAN_TX_LIST)
     {
@@ -182,7 +182,7 @@ static void ProcessSingleLine(char *line) {
         can_info.can_data[i] = (uint8_t)strtoul(ptr, NULL, 16);
     }
 /** 测试 **/
-#if 0
+#if 1
     static uint8_t cnt = 0;
     static uint8_t cnt_100ms = 0;
     if(TIM2_IrqFlag1 == 1)
@@ -205,30 +205,19 @@ static void ProcessSingleLine(char *line) {
     }
 #endif
 /** 测试 **/
-    char id[5] = {0};
-    char data[25] = {0};
 	if(command == 1) {
         CAN1_SendData(can_info.can_id, can_info.can_data);
         
-        //将can报文ID和数据解析成字符串，用于LCD显示
-        sprintf(id, "%03X ", can_info.can_id);
-        sprintf(data, "%02X %02X %02X %02X %02X %02X %02X %02X", can_info.can_data[0], can_info.can_data[1], can_info.can_data[2], 
-                can_info.can_data[3], can_info.can_data[4], can_info.can_data[5], can_info.can_data[6], can_info.can_data[7]);
-        
+        //更新CAN_TX_LIST，用于Lcd屏显示
         int8_t ExistPos = CheckIsInCanList(CAN_TX_LIST, can_info.can_id);
         int8_t IdlePos = FindCanListIdleIndex(CAN_TX_LIST);
         if(ExistPos != -1)
         {       //如果该报文已经在CanTxList中，则刷新
-            LCD_String(0, SIZE_16_LINE(ExistPos), id, 16, RED, BLACK);
-            LCD_String(32, SIZE_16_LINE(ExistPos), data, 16, GREEN, BLACK);
-            LcdFlash(CAN_TX_LIST, ExistPos);
+            UpdateCanList(CAN_TX_LIST, ExistPos, can_info);
         }
         else if(IdlePos != -1)
         {       //如果不在CanTxList中，则加入找到的空闲位置并刷新
-            InsertCanList(CAN_TX_LIST, IdlePos, can_info);
-            LCD_String(0, SIZE_16_LINE(IdlePos), id, 16, RED, BLACK);
-            LCD_String(32, SIZE_16_LINE(IdlePos), data, 16, GREEN, BLACK);
-            LcdFlash(CAN_TX_LIST, IdlePos);
+            UpdateCanList(CAN_TX_LIST, IdlePos, can_info);
         }
 		System_DelayMS(1);
     }
@@ -271,35 +260,66 @@ void UsartCtlCan(void)
     }
     
     //处理接收
-    char id[5] = {0};
-    char data[25] = {0};
     if(xCAN.RxFlag == 1)                        // 通过接收标志xCan.RxFlag，判断是否收到新报文
     {
         can_info.can_id = xCAN.RxData.StdId;
         memcpy(can_info.can_data, xCAN.RxData.Data, 8);
         
-        //将can报文ID和数据解析成字符串，用于LCD显示
-        sprintf(id, "%03X ", can_info.can_id);
-        sprintf(data, "%02X %02X %02X %02X %02X %02X %02X %02X", can_info.can_data[0], can_info.can_data[1], can_info.can_data[2], 
-                can_info.can_data[3], can_info.can_data[4], can_info.can_data[5], can_info.can_data[6], can_info.can_data[7]);
-        
         int8_t ExistPos = CheckIsInCanList(CAN_RX_LIST, xCAN.RxData.StdId);
         int8_t IdlePos = FindCanListIdleIndex(CAN_RX_LIST);
         if(ExistPos != -1)
         {       //如果该报文已经在CanRxList中，则刷新
-            LCD_String(0, 170 + SIZE_16_LINE(ExistPos), id, 16, RED, BLACK);
-            LCD_String(32, 170 + SIZE_16_LINE(ExistPos), data, 16, GREEN, BLACK);
-            LcdFlash(CAN_RX_LIST, ExistPos);
+            UpdateCanList(CAN_RX_LIST, ExistPos, can_info);
         }
         else if(IdlePos != -1)
         {       //如果不在CanRxList中，则加入找到的空闲位置并刷新
-            InsertCanList(CAN_RX_LIST, IdlePos, can_info);
-            LCD_String(0, 170 + SIZE_16_LINE(IdlePos), id, 16, RED, BLACK);
-            LCD_String(32, 170 + SIZE_16_LINE(IdlePos), data, 16, GREEN, BLACK);
-            LcdFlash(CAN_RX_LIST, IdlePos);
+            UpdateCanList(CAN_RX_LIST, IdlePos, can_info);
         }
         
         xCAN.RxFlag = 0;                       // 处理完数据了，把接收标志清0
+    }
+    
+    char id[5] = {0};
+    char data[25] = {0};
+    for(uint8_t i = 0; i < CAN_LIST_NUM; i++)
+    {
+        if(canTx_list[i].IdleFlag == 1)
+        {
+            //将can报文ID和数据解析成字符串，用于LCD显示
+            sprintf(id, "%03X ", canTx_list[i].can_info.can_id);
+            sprintf(data, "%02X %02X %02X %02X %02X %02X %02X %02X",
+                    canTx_list[i].can_info.can_data[0],
+                    canTx_list[i].can_info.can_data[1],
+                    canTx_list[i].can_info.can_data[2],
+                    canTx_list[i].can_info.can_data[3],
+                    canTx_list[i].can_info.can_data[4],
+                    canTx_list[i].can_info.can_data[5],
+                    canTx_list[i].can_info.can_data[6],
+                    canTx_list[i].can_info.can_data[7]
+            );
+            LCD_String(0, SIZE_16_LINE(i), id, 16, RED, BLACK);
+            LCD_String(32, SIZE_16_LINE(i), data, 16, GREEN, BLACK);
+            LcdFlash(CAN_TX_LIST, i);
+        }
+        
+        if(canRx_list[i].IdleFlag == 1)
+        {
+            //将can报文ID和数据解析成字符串，用于LCD显示
+            sprintf(id, "%03X ", canRx_list[i].can_info.can_id);
+            sprintf(data, "%02X %02X %02X %02X %02X %02X %02X %02X",
+                    canRx_list[i].can_info.can_data[0],
+                    canRx_list[i].can_info.can_data[1],
+                    canRx_list[i].can_info.can_data[2],
+                    canRx_list[i].can_info.can_data[3],
+                    canRx_list[i].can_info.can_data[4],
+                    canRx_list[i].can_info.can_data[5],
+                    canRx_list[i].can_info.can_data[6],
+                    canRx_list[i].can_info.can_data[7]
+            );
+            LCD_String(0, 170 + SIZE_16_LINE(i), id, 16, RED, BLACK);
+            LCD_String(32, 170 + SIZE_16_LINE(i), data, 16, GREEN, BLACK);
+            LcdFlash(CAN_RX_LIST, i);
+        }
     }
 }
 
