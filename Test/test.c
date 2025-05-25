@@ -77,10 +77,10 @@ void Can_test(void)
 
 void Timer_test(void)
 {
-    if(TIM2_IrqFlag)
+    if(TIM2_IrqFlag3)
     {
         printf("%d\r\n",TIM2_Num);
-        TIM2_IrqFlag = 0;
+        TIM2_IrqFlag3 = 0;
     }
 }
 
@@ -231,7 +231,7 @@ void IC_test(void)
         OLED_ShowString(0, 17, "Duty:00%", OLED_8X16);          //2行1列显示字符串Duty:00%
         OLED_Update();
     }
-    if(TIM2_IrqFlag)
+    if(TIM2_IrqFlag4)
     {
         delay++;
         if(delay > 3000)    //3s
@@ -245,7 +245,7 @@ void IC_test(void)
             duty += 10;
             if(duty > 100)  duty = 0;
         }
-        TIM2_IrqFlag = 0;
+        TIM2_IrqFlag4 = 0;
     }
     OLED_ShowNum(40, 0, IC_GetFreq(), 5, OLED_8X16);    //不断刷新显示输入捕获测得的频率
     OLED_ShowNum(40, 17, IC_GetDuty(), 2, OLED_8X16);    //不断刷新显示输入捕获测得的占空比

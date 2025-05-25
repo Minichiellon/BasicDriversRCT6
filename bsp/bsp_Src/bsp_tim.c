@@ -1,7 +1,10 @@
 #include "bsp_tim.h"
 
 uint16_t TIM2_Num;
-uint8_t TIM2_IrqFlag;
+uint8_t TIM2_IrqFlag1;
+uint8_t TIM2_IrqFlag2;
+uint8_t TIM2_IrqFlag3;
+uint8_t TIM2_IrqFlag4;
 /**
   * 函    数：定时中断初始化
   * 参    数：无
@@ -56,7 +59,10 @@ void TIM2_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
 	{
-		TIM2_IrqFlag = 1;
+		TIM2_IrqFlag1 = 1;
+        TIM2_IrqFlag2 = 1;
+        TIM2_IrqFlag3 = 1;
+        TIM2_IrqFlag4 = 1;
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 	}
 }
