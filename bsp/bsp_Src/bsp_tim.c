@@ -54,15 +54,3 @@ void Timer_Init(void)
 	TIM_Cmd(TIM2, ENABLE);			//使能TIM2，定时器开始运行
 }
 
-//定时器中断函数，可以复制到使用它的地方
-void TIM2_IRQHandler(void)
-{
-	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
-	{
-		TIM2_IrqFlag1 = 1;
-        TIM2_IrqFlag2 = 1;
-        TIM2_IrqFlag3 = 1;
-        TIM2_IrqFlag4 = 1;
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-	}
-}

@@ -52,7 +52,7 @@ extern xCAN_InfoDef  xCAN;         // 声明为全局变量,方便记录信息、状态
 extern void CAN1_Config(uint16_t baudrate);
 extern uint8_t CAN1_SendData(uint32_t targetID, uint8_t* data);    // 发送数据; data:数据缓存，targetID:ID号，　返回：发送所用的邮箱号
 extern void    CAN1_ReceiveData(uint8_t* data);                    // 接收数据
-
+extern uint8_t CAN_CheckReceived(uint32_t* pID, uint8_t* pData);
 
 #endif
 

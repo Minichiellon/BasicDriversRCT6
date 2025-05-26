@@ -7,15 +7,18 @@ typedef struct
 {
     uint32_t can_id;
     uint8_t can_data[8];
+    uint16_t TimeOutTime;       //超时时间，单位ms
+    uint8_t TimeOutFlag;
+    uint64_t last_time;
 }CAN_INFO;
 
 typedef struct
 {
     uint8_t IdleFlag;
-    uint16_t TimeOutFlag;
     CAN_INFO can_info;
 }CAN_List;
 
 extern void UsartCtlCan(void);
+extern void CanListInit(void);
 
 #endif
