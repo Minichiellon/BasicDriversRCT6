@@ -31,7 +31,7 @@ int main(void)                                       // 主函数, 整个工程的用户代
     bsp_init();
     System_SysTickInit();
 	System_DelayMS(200);
-    
+
     while (1)                                        // while函数死循环，不能让main函数运行结束，否则会产生硬件错误
     {
 //        bsp_test();

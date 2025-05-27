@@ -31,7 +31,7 @@ void CAN1_Config(uint16_t baudrate)
     CAN_InitStructure.CAN_ABOM = ENABLE;               // 自动离线管理
     CAN_InitStructure.CAN_AWUM = ENABLE;               // 自动唤醒
     CAN_InitStructure.CAN_Mode = CAN_Mode_LoopBack ;     // 工作模式，　Normal=正常, LoopBack=回环, Silent=静默, Silent_LoopBack=静默回环
-    CAN_InitStructure.CAN_NART = ENABLE;               // 错误重传
+    CAN_InitStructure.CAN_NART = DISABLE;               // 错误重传
     CAN_InitStructure.CAN_RFLM = ENABLE;               // FIFO锁定，新的不能覆盖旧的
     CAN_InitStructure.CAN_TTCM = DISABLE;              // 时间触发
     CAN_InitStructure.CAN_TXFP = DISABLE;              // 按报文存入邮箱的先后顺序发送，否则按默认ID优先级发送

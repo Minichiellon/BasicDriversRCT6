@@ -7,6 +7,7 @@ typedef struct
 {
     uint32_t can_id;
     uint8_t can_data[8];
+    uint16_t TxTime;
     uint16_t TimeOutTime;       //超时时间，单位ms
     uint8_t TimeOutFlag;
     uint64_t last_time;

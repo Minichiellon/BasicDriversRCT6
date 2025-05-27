@@ -25,6 +25,7 @@ void CanListInit(void)
         canTx_list[i].can_info.can_id = 0;
         memset(canTx_list[i].can_info.can_data, 0, 8);
 
+        canTx_list[i].can_info.TxTime= 0xFFFF;
         canTx_list[i].can_info.TimeOutTime = 1000;
         canTx_list[i].can_info.last_time = 0;
         canTx_list[i].IdleFlag = 1;
@@ -121,7 +122,9 @@ static void UpdateCanList(uint8_t CanListType, uint8_t Pos, CAN_INFO CanInfo)
         canTx_list[Pos].can_info.can_id = CanInfo.can_id;
         memcpy(canTx_list[Pos].can_info.can_data, CanInfo.can_data, 8);
         canTx_list[Pos].can_info.last_time = CanInfo.last_time;
+        canTx_list[Pos].can_info.TxTime= CanInfo.TxTime;
         canTx_list[Pos].IdleFlag = 0;
+        
     }
     else if(CanListType == CAN_RX_LIST)
     {
@@ -142,11 +145,11 @@ static uint16_t cnt[2*CAN_LIST_NUM] = {0};          //每条报文的cnt计数�
 static uint16_t StateFlag[2*CAN_LIST_NUM] = {0};    //每条报文的指示状态，0 ~ CAN_LIST_NUM-1表示Tx报文，CAN_LIST_NUM ~ 2*CAN_LIST_NUM-1表示Rx报文
 static void LcdFlash(uint8_t CanListType, int8_t Pos)
 {
-    if(cnt[CanListType*CAN_LIST_NUM+Pos] >= 1 && cnt[CanListType*CAN_LIST_NUM+Pos] <= 5)      //亮
+    if(cnt[CanListType*CAN_LIST_NUM+Pos] >= 1 && cnt[CanListType*CAN_LIST_NUM+Pos] <= 500)      //亮
     {
         StateFlag[CanListType*CAN_LIST_NUM+Pos] = 1;
     }
-    else if(cnt[CanListType*CAN_LIST_NUM+Pos] > 5 && cnt[CanListType*CAN_LIST_NUM+Pos] <= 10)      //灭
+    else if(cnt[CanListType*CAN_LIST_NUM+Pos] > 500 && cnt[CanListType*CAN_LIST_NUM+Pos] <= 1000)      //灭
     {
         StateFlag[CanListType*CAN_LIST_NUM+Pos] = 0;
     }
@@ -214,25 +217,46 @@ static void ProcessSingleLine(char *line) {
     // 解析命令位
     uint8_t command = atoi(ptr);
     if(command != 0 && command != 1) return;
-
+    
     // 解析CAN ID
     ptr = strtok(NULL, " ");
     if(!ptr) return;
-    
     // 使用strtoul直接转换完整十六进制字符串
     can_info.can_id = strtoul(ptr, NULL, 16);
     
     // 验证ID范围（标准帧ID范围0x000-0x7FF）
     if(can_info.can_id > 0x7FF) return;
+    
+    // 解析发送时间
+    ptr = strtok(NULL, " ");
+    can_info.TxTime = atoi(ptr);
 
-    // 解析数据段（保持原逻辑）
+    // 解析数据段
     for(int i = 0; i < 8; i++) {
         ptr = strtok(NULL, " ");
         if(!ptr) return;
         can_info.can_data[i] = (uint8_t)strtoul(ptr, NULL, 16);
     }
-/** 测试 **/
-#if 1
+    
+/*************************** 更新至发送列表******************************/
+    if(command == 1) {
+        can_info.last_time = System_GetTimeMs();
+        //更新CAN_TX_LIST
+        int8_t ExistPos = CheckIsInCanList(CAN_TX_LIST, can_info.can_id);
+        int8_t IdlePos = FindCanListIdleIndex(CAN_TX_LIST);
+        if(ExistPos != -1)
+        {       //如果该报文已经在CanTxList中，则刷新
+            UpdateCanList(CAN_TX_LIST, ExistPos, can_info);
+        }
+        else if(IdlePos != -1)
+        {       //如果不在CanTxList中，则加入找到的空闲位置并刷新
+            UpdateCanList(CAN_TX_LIST, IdlePos, can_info);
+        }
+    }
+/**********************************************************************/   
+    
+/********************************* 测试 *******************************/
+#if 0
     static uint8_t cnt = 0;
     static uint8_t cnt_100ms = 0;
     if(TIM2_IrqFlag1 == 1)
@@ -254,24 +278,7 @@ static void ProcessSingleLine(char *line) {
         cnt_100ms = 0;
     }
 #endif
-/** 测试 **/
-	if(command == 1) {
-        CAN1_SendData(can_info.can_id, can_info.can_data);
-        
-        can_info.last_time = System_GetTimeMs();
-        //更新CAN_TX_LIST，用于Lcd屏显示
-        int8_t ExistPos = CheckIsInCanList(CAN_TX_LIST, can_info.can_id);
-        int8_t IdlePos = FindCanListIdleIndex(CAN_TX_LIST);
-        if(ExistPos != -1)
-        {       //如果该报文已经在CanTxList中，则刷新
-            UpdateCanList(CAN_TX_LIST, ExistPos, can_info);
-        }
-        else if(IdlePos != -1)
-        {       //如果不在CanTxList中，则加入找到的空闲位置并刷新
-            UpdateCanList(CAN_TX_LIST, IdlePos, can_info);
-        }
-		System_DelayMS(1);
-    }
+/*************************************************************************/
 }
 
 /**
@@ -296,6 +303,7 @@ static void ProcessUartData(uint8_t *data, uint16_t len) {
         line = strtok_r(NULL, "\r\n", &saveptr);
     }
 }
+
 
 
 void UsartCtlCan(void)
@@ -395,12 +403,35 @@ void TIM2_IRQHandler(void)
         for(int i = 0; i < 2*CAN_LIST_NUM; i++)
         {
             cnt[i]++;
-            if(cnt[i] > 10) cnt[i] = 0;
+            if(cnt[i] > 1000) cnt[i] = 0;
         }
 		TIM2_IrqFlag1 = 1;
         TIM2_IrqFlag2 = 1;
         TIM2_IrqFlag3 = 1;
         TIM2_IrqFlag4 = 1;
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	}
+}
+
+void TIM3_IRQHandler(void)
+{
+    static uint16_t Tim3_cnt = 0;
+	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == SET)
+	{
+        Tim3_cnt++;
+        if(Tim3_cnt > 5000) Tim3_cnt = 1;
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+        
+        for(uint8_t i = 0; i < CAN_LIST_NUM; i++)
+        {
+            if(canTx_list[i].IdleFlag == 0)
+            {
+                if(Tim3_cnt % canTx_list[i].can_info.TxTime == 0)
+                {
+                    CAN1_SendData(canTx_list[i].can_info.can_id, canTx_list[i].can_info.can_data);
+                    canTx_list[i].can_info.last_time = System_GetTimeMs();
+                }
+            }
+        }
 	}
 }

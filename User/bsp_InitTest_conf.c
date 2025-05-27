@@ -2,15 +2,15 @@
 
 void bsp_init(void)
 {
-    uint16_t CAN1_baudrate = 125;
+    uint16_t CAN1_baudrate = 250;
     USART1_Init(115200);        // 串口初始化        //TODO：串口2、3、4、5代码改写为库函数、加DMA
     System_SwdMode();           // 设置芯片调试方式(SWD); 关闭JTAG只保留SWD; 目的:释放PB3、PB4、PA15，只需PA13、PA14
     Led_Init();                 // LED初始化
     Key_Init();                 // KEY初始化
     Timer_Init();               // 定时器初始化
     OLED_Init();                // OLED初始化      //8*16大小，A行B列坐标：（ (B-1)*8, (A-1)*16 ）
-    PWM_Init();                 // PWM初始化
-    IC_Init();                  // 输入捕获初始化
+//    PWM_Init();                 // PWM初始化
+//    IC_Init();                  // 输入捕获初始化
     AD_Init();                  // ADC初始化
     MPU6050_Init();		        // MPU6050初始化
     W25Q64_Init();              // W25Q64初始化        //TODO：W25Q系列芯片统一
@@ -38,5 +38,5 @@ void bsp_test(void)
 //    ADC_test();
 //    MPU6050_test();
 //    W25Q64_test(); 
-    Flash_test();
+//    Flash_test();
 }
