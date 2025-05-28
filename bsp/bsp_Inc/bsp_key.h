@@ -65,11 +65,11 @@ typedef enum
 /*****************************************************************************
  ** 声明全局函数
 ****************************************************************************/
-extern void Key_Init(void);
-extern uint8_t Key_GetNum(void);
-extern void handleClick(void);
-extern void handleDoubleClick(void);
-extern void handleLongPress(void);
-extern void CheckKeyEvent(KeyIndex key);
+void Key_Init(void);
+uint8_t Key_GetNum(void);
+void handleClick(void);
+void handleDoubleClick(void);
+void handleLongPress(void);
+void CheckKeyEvent(KeyIndex key);
 #endif
 

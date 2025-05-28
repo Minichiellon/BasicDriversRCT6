@@ -10,7 +10,7 @@ extern uint8_t TIM2_IrqFlag2;
 extern uint8_t TIM2_IrqFlag3;
 extern uint8_t TIM2_IrqFlag4;
 
-extern void Timer_Init(void);
+void Timer_Init(void);
 
 #endif
 

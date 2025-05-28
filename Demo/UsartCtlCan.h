@@ -19,7 +19,7 @@ typedef struct
     CAN_INFO can_info;
 }CAN_List;
 
-extern void UsartCtlCan(void);
-extern void CanListInit(void);
+void UsartCtlCan(void);
+void CanListInit(void);
 
 #endif

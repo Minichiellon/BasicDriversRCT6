@@ -109,31 +109,31 @@ extern xUSATR_TypeDef  xUSART;                      // 声明为全局变量,方便记录信
  ** (不用修改)
 ****************************************************************************/
 // USART1
-extern void    USART1_Init (uint32_t baudrate);                      // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
-extern uint8_t USART1_GetBuffer (uint8_t* buffer, uint8_t* cnt);     // 获取接收到的数据
-extern void    USART1_SendData (uint8_t* buf, uint8_t cnt);          // 通过中断发送数据，适合各种数据
-extern void    USART1_SendString (char* stringTemp);                 // 通过中断发送字符串，适合字符串，长度在256个长度内的
-extern void    USART1_printfForDMA (char* stringTemp) ;              // 通过DMA发送数据，适合一次过发送数据量特别大的字符串，省了占用中断的时间
+void    USART1_Init (uint32_t baudrate);                      // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
+uint8_t USART1_GetBuffer (uint8_t* buffer, uint8_t* cnt);     // 获取接收到的数据
+void    USART1_SendData (uint8_t* buf, uint8_t cnt);          // 通过中断发送数据，适合各种数据
+void    USART1_SendString (char* stringTemp);                 // 通过中断发送字符串，适合字符串，长度在256个长度内的
+void    USART1_printfForDMA (char* stringTemp) ;              // 通过DMA发送数据，适合一次过发送数据量特别大的字符串，省了占用中断的时间
 // USART2
-extern void    USART2_Init (uint32_t baudrate);                      // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
-extern uint8_t USART2_GetBuffer (uint8_t* buffer, uint8_t* cnt);     // 获取接收到的数据
-extern void    USART2_SendData (uint8_t* buf, uint8_t cnt);          // 通过中断发送数据，适合各种数据
-extern void    USART2_SendString (char* stringTemp);                 // 通过中断发送字符串，适合字符串，长度在256个长度内的
+void    USART2_Init (uint32_t baudrate);                      // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
+uint8_t USART2_GetBuffer (uint8_t* buffer, uint8_t* cnt);     // 获取接收到的数据
+void    USART2_SendData (uint8_t* buf, uint8_t cnt);          // 通过中断发送数据，适合各种数据
+void    USART2_SendString (char* stringTemp);                 // 通过中断发送字符串，适合字符串，长度在256个长度内的
 // USART3
-extern void    USART3_Init (uint32_t baudrate);                      // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
-extern uint8_t USART3_GetBuffer (uint8_t* buffer, uint8_t* cnt);     // 获取接收到的数据
-extern void    USART3_SendData (uint8_t* buf, uint8_t cnt);          // 通过中断发送数据，适合各种数据
-extern void    USART3_SendString (char* stringTemp);                 // 通过中断发送字符串，适合字符串，长度在256个长度内的
+void    USART3_Init (uint32_t baudrate);                      // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
+uint8_t USART3_GetBuffer (uint8_t* buffer, uint8_t* cnt);     // 获取接收到的数据
+void    USART3_SendData (uint8_t* buf, uint8_t cnt);          // 通过中断发送数据，适合各种数据
+void    USART3_SendString (char* stringTemp);                 // 通过中断发送字符串，适合字符串，长度在256个长度内的
 // USART4
-extern void    UART4_Init (uint32_t baudrate);                       // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
-extern uint8_t UART4_GetBuffer (uint8_t* buffer, uint8_t* cnt);      // 获取接收到的数据
-extern void    UART4_SendData (uint8_t* buf, uint8_t cnt);           // 通过中断发送数据，适合各种数据
-extern void    UART4_SendString (char* stringTemp);                  // 通过中断发送字符串，适合字符串，长度在256个长度内的
+void    UART4_Init (uint32_t baudrate);                       // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
+uint8_t UART4_GetBuffer (uint8_t* buffer, uint8_t* cnt);      // 获取接收到的数据
+void    UART4_SendData (uint8_t* buf, uint8_t cnt);           // 通过中断发送数据，适合各种数据
+void    UART4_SendString (char* stringTemp);                  // 通过中断发送字符串，适合字符串，长度在256个长度内的
 // USART5
-extern void    UART5_Init (uint32_t baudrate);                       // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
-extern uint8_t UART5_GetBuffer (uint8_t* buffer, uint8_t* cnt);      // 获取接收到的数据
-extern void    UART5_SendData (uint8_t* buf, uint8_t cnt);           // 通过中断发送数据，适合各种数据
-extern void    UART5_SendString (char* stringTemp);                  // 通过中断发送字符串，适合字符串，长度在256个长度内的
+void    UART5_Init (uint32_t baudrate);                       // 初始化串口的GPIO、通信参数配置、中断优先级; (波特率可设、8位数据、无校验、1个停止位)
+uint8_t UART5_GetBuffer (uint8_t* buffer, uint8_t* cnt);      // 获取接收到的数据
+void    UART5_SendData (uint8_t* buf, uint8_t cnt);           // 通过中断发送数据，适合各种数据
+void    UART5_SendString (char* stringTemp);                  // 通过中断发送字符串，适合字符串，长度在256个长度内的
 
 
 #endif

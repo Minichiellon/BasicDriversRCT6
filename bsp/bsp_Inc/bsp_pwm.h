@@ -4,8 +4,8 @@
 #include <stm32f10x.h>  
 #include <stdio.h>
 
-extern void PWM_Init(void);
-extern void PWM_SetCompare1(uint16_t Compare);
-extern void PWM_SetPrescaler(uint16_t Prescaler);
+void PWM_Init(void);
+void PWM_SetCompare1(uint16_t Compare);
+void PWM_SetPrescaler(uint16_t Prescaler);
 #endif
 

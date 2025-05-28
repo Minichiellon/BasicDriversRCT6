@@ -44,9 +44,9 @@
 /*****************************************************************************
  ** 声明全局函数
 ****************************************************************************/
-extern void Led_Init(void);
-extern void LED_RED_TOGGLE(void);
-extern void LED_BLUE_TOGGLE(void);
+void Led_Init(void);
+void LED_RED_TOGGLE(void);
+void LED_BLUE_TOGGLE(void);
 
 #endif
 

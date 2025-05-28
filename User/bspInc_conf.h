@@ -16,7 +16,7 @@
 #include "bsp_w25qxx.h"         // w25qxx代码文件
 #include "bsp_lcd_ili9341.h"    // Lcd代码文件
 
-extern void bsp_init(void);
-extern void bsp_test(void);
+void bsp_init(void);
+void bsp_test(void);
 
 #endif

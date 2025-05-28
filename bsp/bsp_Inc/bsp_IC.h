@@ -3,8 +3,8 @@
 
 #include "stm32f10x.h"                  // Device header
 
-extern void IC_Init(void);
-extern uint32_t IC_GetFreq(void);
-extern uint32_t IC_GetDuty(void);
+void IC_Init(void);
+uint32_t IC_GetFreq(void);
+uint32_t IC_GetDuty(void);
 
 #endif

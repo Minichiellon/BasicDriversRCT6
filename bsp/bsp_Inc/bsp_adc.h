@@ -5,6 +5,6 @@
 
 extern uint16_t AD_Value[4];
 
-extern void AD_Init(void);
+void AD_Init(void);
 
 #endif
