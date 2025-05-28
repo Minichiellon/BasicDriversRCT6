@@ -13,7 +13,7 @@
 #define CAN_TX_LIST     0
 #define CAN_RX_LIST     1
 
-#define CAN_LIST_NUM    5           //报文列表大小
+#define CAN_LIST_NUM    8           //报文列表大小
 CAN_List canTx_list[CAN_LIST_NUM];  //发送报文列表，用于Lcd屏刷新
 CAN_List canRx_list[CAN_LIST_NUM];  //接收报文列表，用于Lcd屏刷新
 
@@ -238,23 +238,6 @@ static void ProcessSingleLine(char *line) {
         can_info.can_data[i] = (uint8_t)strtoul(ptr, NULL, 16);
     }
     
-/*************************** 更新至发送列表******************************/
-    if(command == 1) {
-        can_info.last_time = System_GetTimeMs();
-        //更新CAN_TX_LIST
-        int8_t ExistPos = CheckIsInCanList(CAN_TX_LIST, can_info.can_id);
-        int8_t IdlePos = FindCanListIdleIndex(CAN_TX_LIST);
-        if(ExistPos != -1)
-        {       //如果该报文已经在CanTxList中，则刷新
-            UpdateCanList(CAN_TX_LIST, ExistPos, can_info);
-        }
-        else if(IdlePos != -1)
-        {       //如果不在CanTxList中，则加入找到的空闲位置并刷新
-            UpdateCanList(CAN_TX_LIST, IdlePos, can_info);
-        }
-    }
-/**********************************************************************/   
-    
 /********************************* 测试 *******************************/
 #if 0
     static uint8_t cnt = 0;
@@ -279,6 +262,36 @@ static void ProcessSingleLine(char *line) {
     }
 #endif
 /*************************************************************************/
+    
+/*************************** 更新至发送列表******************************/
+    if(command == 1) {
+        can_info.last_time = System_GetTimeMs();
+        //更新CAN_TX_LIST
+        int8_t ExistPos = CheckIsInCanList(CAN_TX_LIST, can_info.can_id);
+        int8_t IdlePos = FindCanListIdleIndex(CAN_TX_LIST);
+        if(ExistPos != -1)
+        {       //如果该报文已经在CanTxList中，则刷新
+            UpdateCanList(CAN_TX_LIST, ExistPos, can_info);
+        }
+        else if(IdlePos != -1)
+        {       //如果不在CanTxList中，则加入找到的空闲位置并刷新
+            UpdateCanList(CAN_TX_LIST, IdlePos, can_info);
+        }
+    }
+    
+    if(command == 0)
+    {
+        int8_t ExistPos = CheckIsInCanList(CAN_TX_LIST, can_info.can_id);
+        if(ExistPos != -1)
+        {       //如果该报文在CanTxList中，则清除
+            memset(&canTx_list[ExistPos], 0, sizeof(canTx_list[ExistPos]));
+            canTx_list[ExistPos].IdleFlag = 1;
+            canTx_list[ExistPos].can_info.TimeOutFlag = 1;
+            canTx_list[ExistPos].can_info.TimeOutTime = 1000;
+            canTx_list[ExistPos].can_info.TxTime = 0xFFFF;
+        }
+    }
+/**********************************************************************/   
 }
 
 /**
@@ -322,8 +335,13 @@ void UsartCtlCan(void)
     //处理发送
     if(xUSART.USART1ReceivedNum > 0)
     {
+        uint32_t primask = __get_PRIMASK();
+        __disable_irq();
+        
         ProcessUartData(xUSART.USART1ReceivedData, xUSART.USART1ReceivedNum);
         xUSART.USART1ReceivedNum = 0;
+        
+        __set_PRIMASK(primask);
     }
     UpdateTimeOutFlag(CAN_TX_LIST);
     //处理接收
