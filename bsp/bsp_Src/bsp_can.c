@@ -1,5 +1,7 @@
 #include "bsp_can.h"
 #include <string.h>
+//#include "system_f103.h"
+//#include "UsartCtlCan.h"
 
 xCAN_InfoDef  xCAN;         // 声明为全局变量,方便记录信息、状态
 
@@ -55,16 +57,16 @@ void CAN1_Config(uint16_t baudrate)
     CAN_FilterInitTypeStruct.CAN_FilterMaskIdLow  = 0x0000;  
     CAN_FilterInit(&CAN_FilterInitTypeStruct);
     
-//    // 使能中断
-//    CAN_ITConfig (CAN1, CAN_IT_FMP0 , ENABLE);
-//    
-//    // 中断
-//    NVIC_InitTypeDef NVIC_InitStructure;
-//    NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn ;  // 使能邮箱0
-//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; 
-//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//    NVIC_Init (&NVIC_InitStructure);
+    // 使能中断
+    CAN_ITConfig (CAN1, CAN_IT_FMP0 , ENABLE);
+    
+    // 中断
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn ;  // 使能邮箱0
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; 
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init (&NVIC_InitStructure);
     
     printf("CAN 通信配置          配置完成\r\n");
 }
@@ -73,8 +75,20 @@ void CAN1_Config(uint16_t baudrate)
 
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {                                                          // 无需清中断标志，使用CAN_Receive()会自动清    
-//    CAN_Receive(CAN1, CAN_FIFO0, &xCAN.RxData);            // 把FIFO_0接收到数据，存入CanRxMsg结构体中；
-//    xCAN.RxFlag =1;                                        // 自定义的一个标志：数据接收完成标志，方便在外部代码中不断轮询判断
+    CAN_Receive(CAN1, CAN_FIFO0, &xCAN.RxData);            // 把FIFO_0接收到数据，存入CanRxMsg结构体中；
+    xCAN.RxFlag = 1;                                        // 自定义的一个标志：数据接收完成标志，方便在外部代码中不断轮询判断
+//    CAN_INFO can_info;
+//    can_info.last_time = System_GetTimeMs();
+//    int8_t ExistPos = CheckIsInCanList(CAN_RX_LIST, can_info.can_id);
+//    int8_t IdlePos = FindCanListIdleIndex(CAN_RX_LIST);
+//    if(ExistPos != -1)
+//    {       //如果该报文已经在CanRxList中，则刷新
+//        UpdateCanList(CAN_RX_LIST, ExistPos, can_info);
+//    }
+//    else if(IdlePos != -1)
+//    {       //如果不在CanRxList中，则加入找到的空闲位置并刷新
+//        UpdateCanList(CAN_RX_LIST, IdlePos, can_info);
+//    }
                 
 }
 

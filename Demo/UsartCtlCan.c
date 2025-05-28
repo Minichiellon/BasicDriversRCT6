@@ -12,11 +12,17 @@
 
 #define CAN_TX_LIST     0
 #define CAN_RX_LIST     1
-
+#define TIMEOUT_THRESHOLD   3       //超时次数连续超过该阈值，置超时标志位
 #define CAN_LIST_NUM    8           //报文列表大小
-CAN_List canTx_list[CAN_LIST_NUM];  //发送报文列表，用于Lcd屏刷新
+
+CAN_List canTx_list[CAN_LIST_NUM];  //发送报文列表，用于发送报文以及Lcd屏刷新
 CAN_List canRx_list[CAN_LIST_NUM];  //接收报文列表，用于Lcd屏刷新
 
+/**
+  * 函    数：初始化CanList
+  * 参    数：无
+  * 返 回 值：无
+  */
 void CanListInit(void)
 {
     for(uint8_t i = 0; i < CAN_LIST_NUM; i++)
@@ -167,8 +173,15 @@ static void LcdFlash(uint8_t CanListType, int8_t Pos)
     __set_PRIMASK(primask);
 }
 
+/**
+  * 函    数：更新超时标志位
+  * 参    数：CanListType：报文列表类型，0-发送列表，1-接收列表
+  * 返 回 值：无
+  */
 void UpdateTimeOutFlag(uint8_t CanListType)
 {
+    static uint8_t TimeOutCnt[2*CAN_LIST_NUM];
+    
     if(CanListType == CAN_TX_LIST)
     {
         for(uint8_t i = 0; i < CAN_LIST_NUM; i++)
@@ -176,10 +189,15 @@ void UpdateTimeOutFlag(uint8_t CanListType)
             uint64_t currentTime = System_GetTimeMs();
             if(currentTime - canTx_list[i].can_info.last_time > canTx_list[i].can_info.TimeOutTime)
             {
-                canTx_list[i].can_info.TimeOutFlag = 1;
+                TimeOutCnt[i]++;
+                if(TimeOutCnt[i] > TIMEOUT_THRESHOLD)
+                {
+                    canTx_list[i].can_info.TimeOutFlag = 1;
+                }
             }
             else
             {
+                TimeOutCnt[i] = 0;
                 canTx_list[i].can_info.TimeOutFlag = 0;
             }
         }
@@ -191,10 +209,15 @@ void UpdateTimeOutFlag(uint8_t CanListType)
             uint64_t currentTime = System_GetTimeMs();
             if(currentTime - canRx_list[i].can_info.last_time > canRx_list[i].can_info.TimeOutTime)
             {
-                canRx_list[i].can_info.TimeOutFlag = 1;
+                TimeOutCnt[CAN_LIST_NUM + i]++;
+                if(TimeOutCnt[CAN_LIST_NUM + i] > TIMEOUT_THRESHOLD)
+                {
+                    canRx_list[i].can_info.TimeOutFlag = 1;
+                }
             }
             else
             {
+                TimeOutCnt[CAN_LIST_NUM + i] = 0;
                 canRx_list[i].can_info.TimeOutFlag = 0;
             }
         }
@@ -283,11 +306,7 @@ static void ProcessSingleLine(char *line) {
     {
         int8_t ExistPos = CheckIsInCanList(CAN_TX_LIST, can_info.can_id);
         if(ExistPos != -1)
-        {       //如果该报文在CanTxList中，则清除
-            memset(&canTx_list[ExistPos], 0, sizeof(canTx_list[ExistPos]));
-            canTx_list[ExistPos].IdleFlag = 1;
-            canTx_list[ExistPos].can_info.TimeOutFlag = 1;
-            canTx_list[ExistPos].can_info.TimeOutTime = 1000;
+        {       //如果该报文在CanTxList中，将发送时间改为最大值
             canTx_list[ExistPos].can_info.TxTime = 0xFFFF;
         }
     }
@@ -318,7 +337,15 @@ static void ProcessUartData(uint8_t *data, uint16_t len) {
 }
 
 
-
+/**
+  * 函    数：串口控制发送can报文。
+            1.初始化CanList。
+            2.轮询检查串口数据并更新CanTxList。
+            3.轮询接收can报文并更新CanRxList。
+            4.LCD显示can发送报文和接收报文
+  * 参    数：无
+  * 返 回 值：无
+  */
 void UsartCtlCan(void)
 {
     static uint8_t CanListInitFlag = 0;
@@ -344,7 +371,9 @@ void UsartCtlCan(void)
         __set_PRIMASK(primask);
     }
     UpdateTimeOutFlag(CAN_TX_LIST);
+    
     //处理接收
+#if 0
     if(CAN_CheckReceived(&can_info.can_id, can_info.can_data))
     {
         can_info.last_time = System_GetTimeMs();
@@ -359,13 +388,34 @@ void UsartCtlCan(void)
             UpdateCanList(CAN_RX_LIST, IdlePos, can_info);
         }
     }
+#else
+    if(xCAN.RxFlag == 1)
+    {
+        xCAN.RxFlag = 0;
+        
+        can_info.last_time = System_GetTimeMs();
+        can_info.can_id = xCAN.RxData.StdId;
+        memcpy(can_info.can_data, xCAN.RxData.Data, 8);
+        
+        int8_t ExistPos = CheckIsInCanList(CAN_RX_LIST, can_info.can_id);
+        int8_t IdlePos = FindCanListIdleIndex(CAN_RX_LIST);
+        if(ExistPos != -1)
+        {       //如果该报文已经在CanRxList中，则刷新
+            UpdateCanList(CAN_RX_LIST, ExistPos, can_info);
+        }
+        else if(IdlePos != -1)
+        {       //如果不在CanRxList中，则加入找到的空闲位置并刷新
+            UpdateCanList(CAN_RX_LIST, IdlePos, can_info);
+        }
+    }
+#endif
     UpdateTimeOutFlag(CAN_RX_LIST);
     
     char id[5] = {0};
     char data[25] = {0};
     for(uint8_t i = 0; i < CAN_LIST_NUM; i++)
     {
-        if(canTx_list[i].can_info.TimeOutFlag == 0 && canTx_list[i].IdleFlag == 0)
+        if(canTx_list[i].IdleFlag == 0)
         {
             //将can报文ID和数据解析成字符串，用于LCD显示
             sprintf(id, "%03X ", canTx_list[i].can_info.can_id);
@@ -379,16 +429,22 @@ void UsartCtlCan(void)
                     canTx_list[i].can_info.can_data[6],
                     canTx_list[i].can_info.can_data[7]
             );
-            LCD_String(0, SIZE_16_LINE(i), id, 16, RED, BLACK);
-            LCD_String(32, SIZE_16_LINE(i), data, 16, GREEN, BLACK);
-            LcdFlash(CAN_TX_LIST, i);
-        }
-        else
-        {
-            LCD_Fill(28*8, SIZE_16_LINE(i)+2, 29*8, SIZE_16_LINE(i)+12, BLACK);
+            
+            if(canTx_list[i].can_info.TimeOutFlag == 0)      //当前发送该报文且没有超时，显示绿色，且状态闪烁
+            {
+                LCD_String(0, SIZE_16_LINE(i), id, 16, RED, BLACK);
+                LCD_String(32, SIZE_16_LINE(i), data, 16, GREEN, BLACK);
+                LcdFlash(CAN_TX_LIST, i);
+            }
+            else                                             //之前发送过该报文，但是已超时，显示红色
+            {
+                LCD_String(0, SIZE_16_LINE(i), id, 16, RED, BLACK);
+                LCD_String(32, SIZE_16_LINE(i), data, 16, RED, BLACK);
+                LCD_Fill(28*8, SIZE_16_LINE(i)+2, 29*8, SIZE_16_LINE(i)+12, RED);
+            }
         }
         
-        if(canRx_list[i].can_info.TimeOutFlag == 0 && canRx_list[i].IdleFlag == 0)
+        if(canRx_list[i].IdleFlag == 0)      
         {
             //将can报文ID和数据解析成字符串，用于LCD显示
             sprintf(id, "%03X ", canRx_list[i].can_info.can_id);
@@ -402,18 +458,24 @@ void UsartCtlCan(void)
                     canRx_list[i].can_info.can_data[6],
                     canRx_list[i].can_info.can_data[7]
             );
-            LCD_String(0, 170 + SIZE_16_LINE(i), id, 16, RED, BLACK);
-            LCD_String(32, 170 + SIZE_16_LINE(i), data, 16, GREEN, BLACK);
-            LcdFlash(CAN_RX_LIST, i);
-        }
-        else
-        {
-            LCD_Fill(28*8, 170 + SIZE_16_LINE(i)+2, 29*8, 170 + SIZE_16_LINE(i)+12, BLACK);
+            
+            if(canRx_list[i].can_info.TimeOutFlag == 0)         //当前接收该报文且没有超时，显示绿色，且状态闪烁
+            {
+                LCD_String(0, 170 + SIZE_16_LINE(i), id, 16, RED, BLACK);
+                LCD_String(32, 170 + SIZE_16_LINE(i), data, 16, GREEN, BLACK);
+                LcdFlash(CAN_RX_LIST, i);
+            }
+            else                                                //之前发送过该报文，但是已超时，显示红色
+            {
+                LCD_String(0, 170 + SIZE_16_LINE(i), id, 16, RED, BLACK);
+                LCD_String(32, 170 + SIZE_16_LINE(i), data, 16, RED, BLACK);
+                LCD_Fill(28*8, 170 + SIZE_16_LINE(i)+2, 29*8, 170 + SIZE_16_LINE(i)+12, RED);
+            }
         }
     }
 }
 
-//定时器中断函数，可以复制到使用它的地方
+//TIM2定时器中断函数
 void TIM2_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET)
@@ -431,6 +493,7 @@ void TIM2_IRQHandler(void)
 	}
 }
 
+//TIM3定时器中断函数
 void TIM3_IRQHandler(void)
 {
     static uint16_t Tim3_cnt = 0;
